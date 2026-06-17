@@ -1,0 +1,18 @@
+{:paths ["src"]
+
+ :deps {org.clojure/clojure {:mvn/version "1.12.0"}}
+
+ :aliases
+ {;; Alias de desarrollo: levanta un servidor nREPL con el middleware de
+  ;; cider-nrepl (necesario para Calva: evaluación inline, debugger, etc.)
+  ;; y carga Portal para inspeccionar datos grandes.
+  :dev
+  {:extra-deps {nrepl/nrepl                {:mvn/version "1.3.1"}
+                cider/cider-nrepl          {:mvn/version "0.50.2"}
+                djblue/portal              {:mvn/version "0.58.5"}}
+   ;; Arranca nREPL escuchando en TODAS las interfaces (0.0.0.0) para que
+   ;; Calva pueda conectarse desde el host al contenedor Docker.
+   :main-opts ["-m" "nrepl.cmdline"
+               "--middleware" "[cider.nrepl/cider-middleware]"
+               "--bind" "0.0.0.0"
+               "--port" "7888"]}}}

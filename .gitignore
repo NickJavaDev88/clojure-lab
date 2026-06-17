@@ -1,0 +1,20 @@
+# Instrucciones internas para Claude Code — no se publican
+CLAUDE.md
+
+# Cache de compilación de Clojure CLI / deps.edn
+.cpcache/
+
+# Artefactos de build
+target/
+*.jar
+
+# Estado local de Calva / LSP / clj-kondo
+.calva/repl.calva-repl
+.lsp/
+.clj-kondo/.cache/
+
+# nREPL
+.nrepl-port
+
+# macOS
+.DS_Store

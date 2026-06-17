@@ -1,0 +1,19 @@
+services:
+  repl:
+    build: .
+    container_name: clojure-lab
+    ports:
+      - "7888:7888"   # nREPL  -> Calva se conecta a localhost:7888
+      - "5678:5678"   # Portal -> inspector de datos en el navegador
+    volumes:
+      # Montamos el código en vivo: editas en el Mac y el contenedor lo ve
+      # al instante (recargas la función desde el REPL, sin rebuild).
+      - ./src:/app/src
+      - ./deps.edn:/app/deps.edn
+      # Cache de dependencias Maven para no rebajar libs en cada arranque.
+      - clojure-m2:/root/.m2
+    stdin_open: true
+    tty: true
+
+volumes:
+  clojure-m2:
