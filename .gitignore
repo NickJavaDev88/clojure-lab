@@ -16,5 +16,11 @@ target/
 # nREPL
 .nrepl-port
 
+# Herramientas locales de IA (brepl + skills de Claude Code) — no se publican
+.agents/
+.claude/
+.brepl/
+skills-lock.json
+
 # macOS
 .DS_Store
