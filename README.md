@@ -1,78 +1,128 @@
 # Clojure Lab 🧪
 
-Entorno de aprendizaje de Clojure **dentro de Docker**, pensado para dominar
-4 conceptos del desarrollo interactivo. El REPL corre en el contenedor; tú
-editas desde VS Code + Calva en el host y te conectas al REPL del contenedor.
+> 🌐 **Languages:** **English** · [繁體中文](https://github.com/NickJavaDev88/clojure-lab/blob/zh-tw/README.md) · [Español](https://github.com/NickJavaDev88/clojure-lab/blob/es/README.md)
 
-## Arquitectura
+A hands-on Clojure learning environment that runs **inside Docker**, built to
+practice 4 core ideas of interactive development. The REPL runs in the
+container; you edit from VS Code + Calva on your host machine and connect to the
+container's REPL. No JDK or Clojure install needed on your computer — Docker
+handles everything.
+
+## Architecture
 
 ```
-  VS Code + Calva  (host / macOS)
-        │  conecta a nREPL
+  VS Code + Calva  (your machine / macOS or Linux)
+        │  connects to nREPL
         ▼
-  ┌─────────────────────────┐
-  │  Contenedor Docker       │
-  │  - Clojure CLI + JDK 21  │
-  │  - nREPL  :7888          │  ← Calva
-  │  - Portal :5678          │  ← inspector de datos
-  └─────────────────────────┘
-   src/ montado en vivo (editas en el Mac, el contenedor lo ve)
+  ┌──────────────────────────┐
+  │  Docker container         │
+  │  - Clojure CLI + JDK 21   │
+  │  - nREPL  :7888           │  ← Calva connects here
+  │  - Portal :5678           │  ← data inspector UI
+  └──────────────────────────┘
+   src/ is mounted live (you edit on the host, the container sees it instantly)
 ```
 
-## Requisitos (ya verificados en tu Mac)
+## Prerequisites & installation
 
-- Docker corriendo (OrbStack) ✅
-- VS Code ✅
-- **Calva** (extensión de VS Code) — instalar una vez:
-  ```
-  code --install-extension betterthantomorrow.calva
-  ```
+You only need **Docker**, **Git**, **VS Code**, and the **Calva** extension.
+Clojure and the JDK live inside the container, so you don't install them.
 
-## Arrancar
+### macOS
 
 ```bash
-cd ~/clojure-lab
-docker compose up --build      # primera vez (baja libs, ~1-2 min)
-# siguientes veces:  docker compose up
+# 1. Docker runtime (OrbStack recommended — lightweight; Docker Desktop also works)
+#    + VS Code, via Homebrew:
+brew install --cask orbstack visual-studio-code
+
+# 2. Git (skip if you already have it — comes with Xcode Command Line Tools)
+xcode-select --install
+
+# 3. Calva extension for VS Code
+code --install-extension betterthantomorrow.calva
 ```
 
-Cuando veas `nREPL server started on port 7888` el entorno está listo.
+Then launch OrbStack (or Docker Desktop) once so the Docker engine is running.
 
-## Conectar Calva al REPL del contenedor
-
-1. Abre la carpeta `~/clojure-lab` en VS Code.
-2. Paleta de comandos (`Cmd+Shift+P`) → **"Calva: Connect to a Running REPL Server in the Project"**.
-3. Tipo de proyecto: **deps.edn**.
-4. Host:puerto → `localhost:7888`.
-5. Abre `src/learn/core.clj` y empieza a evaluar formas con **Cmd+Enter**.
-
-## Los 4 conceptos (todo en `src/learn/core.clj`)
-
-| # | Concepto | Cómo se practica |
-|---|----------|------------------|
-| 1 | **Interactive development** | Evalúa formas con `Cmd+Enter` / `Cmd+Shift+Enter`; redefine funciones en caliente. |
-| 2 | **Debug por inspección inline** | `tap>` para espiar valores + el debugger de Calva (instrumentar forma). |
-| 3 | **S-expression editing** | Paredit: slurp/barf, expandir selección, edición del árbol de paréntesis. |
-| 4 | **Pretty-print de hashmap grande** | `clojure.pprint/pprint` (texto) y **Portal** en `localhost:5678` (UI navegable). |
-
-## Atajos de Calva más usados
-
-> Atajos definidos en `~/Library/Application Support/Code/User/keybindings.json`
-> (reasignados a `Cmd` por el swap Ctrl↔Cmd a nivel de macOS).
-
-| Acción | Atajo (mac) |
-|--------|-------------|
-| Evaluar forma actual (inline) | `Cmd+Enter` |
-| Evaluar top-level | `Cmd+Shift+Enter` |
-| Mostrar ventana de output | `Cmd+Alt+Enter` |
-| Slurp forward (Paredit) | `Cmd+Alt+.` |
-| Barf forward (Paredit) | `Cmd+Alt+,` |
-| Expandir selección semántica | paleta → "Calva: Expand Selection" |
-| Instrumentar para debug | paleta → "Calva: Instrument Current Form for Debugging" |
-
-## Parar / limpiar
+### Linux
 
 ```bash
-docker compose down            # parar
-docker compose down -v         # parar + borrar cache de libs
+# 1. Docker Engine + the compose plugin
+#    Follow the official guide for your distro:
+#    https://docs.docker.com/engine/install/
+#    (make sure the "docker compose" plugin is included)
+
+# 2. Git + VS Code (Debian/Ubuntu example)
+sudo apt update && sudo apt install -y git
+#    VS Code: https://code.visualstudio.com/docs/setup/linux
+
+# 3. Calva extension for VS Code
+code --install-extension betterthantomorrow.calva
+```
+
+## Get the code
+
+```bash
+git clone https://github.com/NickJavaDev88/clojure-lab.git
+cd clojure-lab
+```
+
+## Start the lab
+
+```bash
+docker compose up --build -d   # first time: downloads libs (~1–2 min)
+# next times:  docker compose up -d
+docker compose ps              # check status and ports
+docker logs clojure-lab        # watch the startup logs
+```
+
+The environment is ready when the logs show:
+
+```
+nREPL server started on port 7888
+```
+
+## Connect Calva to the container's REPL
+
+1. Open the `clojure-lab` folder in VS Code.
+2. Command Palette (`Cmd+Shift+P` on macOS / `Ctrl+Shift+P` on Linux) →
+   **"Calva: Connect to a Running REPL Server in the Project"**.
+3. Project type: **deps.edn**.
+4. Host:port → `localhost:7888`.
+5. Open `src/learn/core.clj` and start evaluating forms with **`Ctrl+Enter`**.
+
+> The warning `No nrepl port file found` is harmless — Calva connects via the
+> explicit port anyway.
+
+## The 4 concepts (all in `src/learn/core.clj`)
+
+| # | Concept | How you practice it |
+|---|---------|---------------------|
+| 1 | **Interactive development** | Evaluate forms with `Ctrl+Enter` / `Alt+Enter`; redefine functions live without restarting. |
+| 2 | **Debug via inline inspection** | `tap>` to spy on values + Calva's debugger (instrument a form). |
+| 3 | **S-expression editing** | Paredit: slurp/barf, expand selection, edit the parenthesis tree structurally. |
+| 4 | **Pretty-printing a large hashmap** | `clojure.pprint/pprint` (text) and **Portal** at `localhost:5678` (navigable UI). |
+
+## Keyboard shortcuts (Calva defaults)
+
+These are Calva's out-of-the-box shortcuts — no custom config needed.
+
+| Action | macOS | Windows / Linux |
+|--------|-------|-----------------|
+| Evaluate current form (inline) | `Ctrl+Enter` | `Ctrl+Enter` |
+| Evaluate top-level form | `Alt+Enter` | `Alt+Enter` |
+| Evaluate enclosing form | `Ctrl+Shift+Enter` | `Ctrl+Shift+Enter` |
+| Slurp forward (Paredit) | `Ctrl+Alt+→` | `Ctrl+Alt+→` *(Linux: `Ctrl+Alt+.`)* |
+| Barf forward (Paredit) | `Ctrl+Alt+←` | `Ctrl+Alt+←` *(Linux: `Ctrl+Alt+,`)* |
+| Expand selection | `Ctrl+W` | `Shift+Alt+→` |
+| Instrument form for debugging | Command Palette → *"Calva: Instrument Current Form for Debugging"* | same |
+
+> The output/results window is opened from the Command Palette
+> (*"Calva: Show Output Window"*) — it has no default keybinding.
+
+## Stop / clean up
+
+```bash
+docker compose down            # stop
+docker compose down -v         # stop + delete the Maven cache volume
 ```

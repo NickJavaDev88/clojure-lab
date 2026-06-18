@@ -1,39 +1,39 @@
 (ns learn.core
-  "Laboratorio para aprender los 4 conceptos del desarrollo en Clojure.
+  "A lab to learn the 4 core concepts of interactive Clojure development.
 
-   CÓMO USAR ESTE ARCHIVO:
-   1. Conecta Calva al REPL del contenedor (ver README).
-   2. Coloca el cursor SOBRE o DESPUÉS de cada forma (paréntesis) y pulsa
-      Cmd+Enter (evaluar forma actual) o Cmd+Shift+Enter (evaluar top-level).
-   3. El resultado aparece INLINE, al lado del código. Eso ya es el
-      concepto #1: desarrollo interactivo."
+   HOW TO USE THIS FILE:
+   1. Connect Calva to the container's REPL (see README).
+   2. Place the cursor ON or AFTER each form (parens) and press
+      Ctrl+Enter (evaluate current form) or Alt+Enter (evaluate top-level).
+   3. The result shows up INLINE, next to the code. That right there is
+      concept #1: interactive development."
   (:require [clojure.pprint :as pp]
             [portal.api :as p]))
 
 ;; ============================================================
-;; CONCEPTO 1 — INTERACTIVE DEVELOPMENT (desarrollo interactivo)
+;; CONCEPT 1 — INTERACTIVE DEVELOPMENT
 ;; ============================================================
-;; La idea: no reinicias el programa. Mantienes un proceso vivo (el REPL)
-;; y le vas mandando trozos de código que modifican su estado al vuelo.
+;; The idea: you don't restart the program. You keep a live process (the REPL)
+;; alive and send it chunks of code that change its state on the fly.
 
-;; Evalúa estas formas una a una (cursor encima + Cmd+Enter):
-(+ 1 2 3)                       ; => 6, aparece inline
+;; Evaluate these forms one by one (cursor on it + Ctrl+Enter):
+(+ 1 2 3)                       ; => 6, shows up inline
 
 
-(def saludo "hola mundo")       ; define una var en el REPL vivo
+(def saludo "hola mundo")       ; defines a var in the live REPL
 
-(clojure.string/upper-case saludo)  ; usa lo que acabas de definir
+(clojure.string/upper-case saludo)  ; use what you just defined
 
-;; Define una función, evalúala, pruébala, MODIFÍCALA y re-evalúala:
-;; cambia el cuerpo, pulsa Cmd+Shift+Enter, y la nueva versión está activa
-;; al instante. Ese ciclo (editar -> evaluar -> ver) es TODO.
+;; Define a function, evaluate it, try it, MODIFY it and re-evaluate:
+;; change the body, press Alt+Enter, and the new version is active
+;; instantly. That cycle (edit -> evaluate -> see) is EVERYTHING.
 (defn doblar [x]
   (* 2 x))
 
-(doblar 21)                     ; => 42  (cambia el 2 por 3 y re-evalúa)
+(doblar 21)                     ; => 42  (change the 2 to a 3 and re-evaluate)
 
-;; Un "comment" es tu cuaderno de pruebas: el código de dentro NO se
-;; ejecuta al cargar el archivo, pero SÍ puedes evaluarlo a mano.
+;; A "comment" is your scratchpad: the code inside is NOT run when the file
+;; loads, but you CAN evaluate it by hand.
 (comment
   (doblar 10)
   (map doblar [1 2 3 4 5])
@@ -41,26 +41,25 @@
 
 
 ;; ============================================================
-;; CONCEPTO 2 — DEBUG USING INLINE INSPECTION (depuración inline)
+;; CONCEPT 2 — DEBUG USING INLINE INSPECTION
 ;; ============================================================
-;; Dos técnicas que usarás todos los días:
+;; Two techniques you'll use every day:
 
-;; (a) tap> : envía un valor a un "inspector" sin ensuciar el flujo.
-;;     tap> devuelve el mismo valor que recibe, así que puedes
-;;     intercalarlo en cualquier parte de un cálculo para espiarlo.
+;; (a) tap> : sends a value to an "inspector" without disturbing the flow.
+;;     tap> returns the same value it receives, so you can drop it
+;;     anywhere in a computation to spy on it.
 (defn procesar [xs]
   (->> xs
        (filter even?)
-       (tap> )            ; <- espía aquí: ver "los pares" en Portal
+       (tap> )            ; <- spy here: see "the even numbers" in Portal
        (map doblar)
        (reduce +)))
 
-;; (b) El DEBUGGER de Calva: pon el cursor dentro de `sumar-debug`,
-;;     ejecuta el comando "Calva: Instrument Current Form for Debugging"
-;;     (desde la paleta Cmd+Shift+P; sin atajo propio por el swap Ctrl/Cmd),
-;;     luego llama a la función. Calva PAUSA la
-;;     ejecución y te muestra el valor de cada símbolo INLINE, paso a paso
-;;     (Enter = siguiente paso).
+;; (b) Calva's DEBUGGER: put the cursor inside `sumar-debug`,
+;;     run the command "Calva: Instrument Current Form for Debugging"
+;;     (from the Command Palette: Cmd+Shift+P / Ctrl+Shift+P),
+;;     then call the function. Calva PAUSES execution and shows you the
+;;     value of each symbol INLINE, step by step (Enter = next step).
 (defn sumar-debug [a b]
   (let [doble-a (* 2 a)
         doble-b (* 2 b)
@@ -69,36 +68,36 @@
 
 (comment
   (procesar [1 2 3 4 5 6])      ; => 24
-  (sumar-debug 3 4)             ; instrumenta y observa cada paso
+  (sumar-debug 3 4)             ; instrument it and watch each step
   ;;=> 14
   )
 
 
 ;; ============================================================
-;; CONCEPTO 3 — S-EXPRESSION EDITING (edición estructural / Paredit)
+;; CONCEPT 3 — S-EXPRESSION EDITING (structural editing / Paredit)
 ;; ============================================================
-;; En Clojure NO editas texto, editas el ÁRBOL de paréntesis. Calva trae
-;; Paredit. Practica con esta forma (no la borres, juega con ella):
+;; In Clojure you DON'T edit text, you edit the parenthesis TREE. Calva ships
+;; Paredit. Practice with this form (don't delete it, play with it):
 ;;
-;;   - Slurp  forward  (Cmd+Alt+.): "traga" el elemento de
-;;                     la derecha DENTRO del paréntesis actual.
-;;   - Barf   forward  (Ctrl+Alt+, o Ctrl+Shift+J): "escupe" el último
-;;                     elemento FUERA del paréntesis.
-;;   - Expandir selección semántica: Ctrl+Shift+Flecha (crece por formas).
-;;   - Subir/raise, splice, etc.
+;;   - Slurp  forward  (Ctrl+Alt+→): "swallows" the element to
+;;                     the right INTO the current parens.
+;;   - Barf   forward  (Ctrl+Alt+←): "spits" the last element
+;;                     OUT of the parens.
+;;   - Expand selection: Ctrl+W (macOS) / Shift+Alt+→ (Win/Linux).
+;;   - Raise, splice, etc.
 ;;
-;; Ejercicio: pon el cursor justo después de (inc 1) y haz Slurp para que
-;; se "coma" el  2 , luego Barf para soltarlo. Ves cómo el paréntesis
-;; respeta siempre el balanceo.
+;; Exercise: put the cursor right after (inc 1) and Slurp so it "eats"
+;; the  2 , then Barf to release it. Notice how the parens always stay
+;; balanced.
 (comment
   (+ (inc 1) 2 3)
   )
 
 
 ;; ============================================================
-;; CONCEPTO 4 — PRETTY PRINT DE UN HASHMAP GRANDE
+;; CONCEPT 4 — PRETTY-PRINTING A LARGE HASHMAP
 ;; ============================================================
-;; Generamos un mapa anidado y "feo" de ver en una sola línea:
+;; We build a nested map that's "ugly" to read on a single line:
 (def datos-grandes
   {:usuario {:id 42
              :nombre "Ada Lovelace"
@@ -115,39 +114,40 @@
               :version "1.0.0"
               :tags ["demo" "aprendizaje" "clojure"]}})
 
-;; --- Opción A: clojure.pprint (siempre disponible, va al REPL) ---
-;; Evalúa esto y mira la consola del REPL: el mapa sale indentado y legible.
+;; --- Option A: clojure.pprint (always available, goes to the REPL) ---
+;; Evaluate this and look at the REPL console: the map comes out indented and
+;; readable.
 (comment
   (pp/pprint datos-grandes)
 
-  ;; Limita la profundidad/anchura para mapas ENORMES:
+  ;; Limit depth/width for HUGE maps:
   (binding [*print-level* 3
             *print-length* 5]
     (pp/pprint datos-grandes))
   )
 
-;; --- Opción B: PORTAL (la forma "sistemática" y recomendada) ---
-;; Portal abre una UI navegable (árbol, tabla, expandir/colapsar nodos).
-;; Es MUCHO mejor que leer texto para mapas grandes.
+;; --- Option B: PORTAL (the "systematic" and recommended way) ---
+;; Portal opens a navigable UI (tree, table, expand/collapse nodes).
+;; It's MUCH better than reading text for large maps.
 ;;
-;; Pasos:
-;;   1. Evalúa (abrir-portal) UNA vez -> abre la UI en localhost:5678.
-;;   2. Cualquier (tap> valor) o (p/submit valor) lo manda a Portal.
-;;   3. Navega el dato: clic para expandir, cambia la "viewer" (tree/table).
+;; Steps:
+;;   1. Evaluate (abrir-portal) ONCE -> opens the UI at localhost:5678.
+;;   2. Any (tap> value) or (p/submit value) sends it to Portal.
+;;   3. Navigate the data: click to expand, switch the "viewer" (tree/table).
 (defn abrir-portal []
   (let [pp (p/open {:host "0.0.0.0" :port 5678 :browser false})]
-    ;; conecta tap> a Portal: todo lo que hagas tap> aparece allí
+    ;; wire tap> to Portal: everything you tap> shows up there
     (add-tap #'p/submit)
     pp))
 
 (comment
-  (abrir-portal)               ; abre Portal -> ve a http://localhost:5678
-  (tap> datos-grandes)         ; manda el mapa grande a Portal y navégalo
-  (tap> {:probando 123})       ; cualquier dato que quieras inspeccionar
+  (abrir-portal)               ; open Portal -> go to http://localhost:5678
+  (tap> datos-grandes)         ; send the big map to Portal and navigate it
+  (tap> {:probando 123})       ; any data you want to inspect
   )
 
 
 ;; ------------------------------------------------------------
-;; Punto de entrada (no imprescindible para el flujo REPL):
+;; Entry point (not essential for the REPL workflow):
 (defn -main [& _]
-  (println "Laboratorio Clojure listo. Conéctate con Calva a localhost:7888"))
+  (println "Clojure lab ready. Connect with Calva to localhost:7888"))
